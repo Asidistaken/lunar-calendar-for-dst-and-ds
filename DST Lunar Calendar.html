@@ -1,0 +1,511 @@
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Don't Starve Together Lunar Calendar</title>
+</head>
+
+<body onload="go(200)">
+    <div class="content-wrapper">
+        <div class="title-container">
+            <img id="headerImage"
+                src="https://assets.klei.com/f/259446/3346x3044/e83798985e/dont-starve-together-logo.png/m/fit-in/800x800/filters:quality(100)"
+                alt="Game Logo">
+            <h2>Lunar Calendar</h2>
+        </div>
+
+        <div class="switch-container">
+            <span class="game-label">Don't Starve Together</span>
+            <label class="switch">
+                <input type="checkbox" onchange="toggleGame()">
+                <span class="slider"></span>
+            </label>
+            <span class="game-label">Don't Starve</span>
+        </div>
+
+        <div class="input-container">
+            Last Day: <input type="text" id="in" value="200" size="7">
+            <button type="button" onclick="go(document.getElementById('in').value)">Generate Calendar</button>
+        </div>
+
+        <div class="input-container">
+            Recalibrate:
+            Day <input type="text" id="startDay" value="1" size="7">
+            Phase <select id="moonPhase">
+                <option value="new">New Moon</option>
+                <option value="quarterWaxing">Quarter (Waxing)</option>
+                <option value="halfWaxing">Half (Waxing)</option>
+                <option value="gibbousWaxing">Gibbous (Waxing)</option>
+                <option value="full">Full Moon</option>
+                <option value="gibbousWaning">Gibbous (Waning)</option>
+                <option value="halfWaning">Half (Waning)</option>
+                <option value="quarterWaning">Quarter (Waning)</option>
+            </select>
+            <button type="button" onclick="recalibrate()">Recalibrate</button>
+        </div>
+
+        <div id="table-container">
+            <div id="out"></div>
+        </div>
+
+        <footer>
+            This calendar app is for Don't Starve and Don't Starve Together and made by Asid.
+        </footer>
+    </div>
+
+</body>
+
+<style>
+	body {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		min-height: 100vh;
+		margin: 0;
+		font-family: Arial, sans-serif;
+		background-color: #D9B26F;
+		font-size: 16px;
+		overflow-x: hidden;
+	}
+
+	.content-wrapper {
+		flex: 1;
+		width: 100%;
+		max-width: 1400px;
+		padding: 20px;
+		box-sizing: border-box;
+	}
+
+	#table-container {
+		margin: 20px 0;
+		width: 100%;
+		overflow-x: hidden;
+		max-width: 100vw;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.compact-table {
+		border-collapse: collapse;
+		background: #f5e6d3;
+		margin: 0 auto;
+		transform-origin: top left;
+		transition: transform 0.3s ease;
+		min-width: min(100%, 1400px);
+	}
+
+	.compact-table th,
+	.compact-table td {
+		border: 2px solid #6b4423;
+		padding: 12px;
+		text-align: center;
+		min-width: 120px;
+	}
+
+	.compact-table th {
+		background-color: #8b5d2e;
+		color: #FFFAFA;
+		font-weight: normal;
+	}
+
+	.phase-header {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 5px;
+		white-space: nowrap;
+	}
+
+	.phase-text {
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+
+	.compact-table img {
+		width: 40px;
+		height: 40px;
+		object-fit: contain;
+		flex-shrink: 0;
+	}
+
+	#table-container::-webkit-scrollbar {
+		height: 8px;
+		background-color: #f5e6d3;
+	}
+
+	#table-container::-webkit-scrollbar-thumb {
+		background: #8b5d2e;
+		border-radius: 4px;
+	}
+
+	#table-container::-webkit-scrollbar-thumb:hover {
+		background: #6b4423;
+	}
+
+	@media (orientation: portrait), (max-aspect-ratio: 1/1) {
+		#table-container {
+			overflow-x: auto;
+			padding-bottom: 10px;
+			scrollbar-color: #8b5d2e #f5e6d3;
+			scrollbar-width: thin;
+		}
+		
+		.compact-table {
+			transform: none !important;
+			min-width: max-content;
+			margin: 0;
+		}
+	}
+
+	.title-container {
+		text-align: center;
+		margin: 20px 0;
+	}
+
+	#headerImage {
+		max-height: 200px;
+		width: auto;
+		object-fit: contain;
+		margin: 0 auto;
+	}
+
+	h2 {
+		margin: 10px 0;
+		color: #FFFAFA;
+		font-size: 1.5rem;
+	}
+
+	.switch-container {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 20px 0;
+		gap: 10px;
+	}
+
+	.switch {
+		position: relative;
+		display: inline-block;
+		width: 60px;
+		height: 34px;
+	}
+
+	.slider {
+		position: absolute;
+		cursor: pointer;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #8b5d2e;
+		transition: .4s;
+		border-radius: 34px;
+	}
+
+	.slider:before {
+		position: absolute;
+		content: "";
+		height: 26px;
+		width: 26px;
+		left: 4px;
+		bottom: 4px;
+		background-color: #FFFAFA;
+		transition: .4s;
+		border-radius: 50%;
+	}
+
+	input:checked + .slider {
+		background-color: #6b4423;
+	}
+
+	input:checked + .slider:before {
+		transform: translateX(26px);
+	}
+
+	.game-label {
+		font-weight: bold;
+		color: #FFFAFA;
+	}
+
+	.input-container {
+		display: flex;
+		justify-content: center;
+		gap: 10px;
+		margin: 20px 0;
+		flex-wrap: wrap;
+	}
+
+	input, button, select {
+		padding: 8px 12px;
+		border: 2px solid #6b4423;
+		border-radius: 6px;
+		font-size: 1rem;
+	}
+
+	button {
+		background: #8b5d2e;
+		color: #FFFAFA;
+		cursor: pointer;
+		transition: background 0.3s;
+	}
+
+	button:hover {
+		background: #6b4423;
+	}
+
+	footer {
+		text-align: center;
+		margin: 20px 0;
+		color: #6b4423;
+	}
+
+	@media (max-width: 1200px) {
+		.compact-table th,
+		.compact-table td {
+			min-width: 100px;
+			padding: 10px;
+		}
+	}
+
+	@media (max-width: 992px) {
+		.compact-table th,
+		.compact-table td {
+			min-width: 90px;
+			padding: 8px;
+			font-size: 0.9em;
+		}
+
+		.compact-table img {
+			width: 30px;
+			height: 30px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		.compact-table {
+			font-size: 0.9em;
+		}
+
+		.compact-table th,
+		.compact-table td {
+			min-width: 80px;
+			padding: 6px;
+		}
+
+		.compact-table img {
+			width: 25px;
+			height: 25px;
+		}
+
+		.phase-text {
+			font-size: 0.8em;
+		}
+
+		.input-container {
+			flex-direction: column;
+			align-items: center;
+		}
+
+		input, button, select {
+			width: 100%;
+			max-width: 300px;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.compact-table {
+			font-size: 0.8em;
+		}
+
+		.compact-table th,
+		.compact-table td {
+			min-width: 70px;
+			padding: 4px;
+		}
+
+		.compact-table img {
+			width: 20px;
+			height: 20px;
+		}
+
+		.phase-text {
+			font-size: 0.7em;
+		}
+
+		h2 {
+			font-size: 1.2rem;
+		}
+	}
+</style>
+
+<script>
+	let isDST = true;
+
+	function toggleGame() {
+		isDST = !isDST;
+		document.getElementById("pageTitle").innerText = isDST ? "Don't Starve Together Lunar Calendar" : "Don't Starve Lunar Calendar";
+		document.getElementById("headerImage").src = isDST ? 
+			"https://assets.klei.com/f/259446/3346x3044/e83798985e/dont-starve-together-logo.png/m/fit-in/800x800/filters:quality(100)" : 
+			"https://assets.klei.com/f/259446/3000x2000/6fcb64342e/don-t-starve-logo.png/m/fit-in/800x800/filters:quality(100)";
+		go(document.getElementById("in").value);
+	}
+
+	function go(lastDay) {
+		document.getElementById("out").innerHTML = moonCycler(parseInt(lastDay));
+		setTimeout(adjustTableScale, 50);
+	}
+
+	function recalibrate() {
+		const startDay = parseInt(document.getElementById("startDay").value) || 1;
+		const phase = document.getElementById("moonPhase").value;
+		const lastDay = parseInt(document.getElementById("in").value) || 200;
+		document.getElementById("out").innerHTML = recalibratedMoonCycler(startDay, phase, lastDay);
+		setTimeout(adjustTableScale, 50);
+	}
+
+	function adjustTableScale() {
+		const container = document.getElementById("table-container");
+		const table = container.querySelector('.compact-table');
+		if (!table) return;
+
+		const isVertical = window.innerWidth < window.innerHeight;
+		
+		if (isVertical) {
+			table.style.transform = 'none';
+			container.style.overflowX = 'auto';
+			return;
+		}
+
+		const containerWidth = container.offsetWidth;
+		const tableWidth = table.offsetWidth;
+		
+		if (tableWidth > containerWidth) {
+			const scale = Math.min(containerWidth / tableWidth, 1);
+			table.style.transform = `scale(${scale})`;
+			container.style.overflowX = 'hidden';
+		} else {
+			table.style.transform = 'scale(1)';
+			container.style.overflowX = 'hidden';
+		}
+	}
+
+	function recalibratedMoonCycler(startDay, phase, lastDay) {
+		const dstPhaseOffsets = {
+			"new": 0,
+			"quarterWaxing": 1,
+			"halfWaxing": 4,
+			"gibbousWaxing": 7,
+			"full": 10,
+			"gibbousWaning": 11,
+			"halfWaning": 14,
+			"quarterWaning": 17
+		};
+		const dsPhaseOffsets = {
+			"new": 0,
+			"quarterWaxing": 2,
+			"halfWaxing": 4,
+			"gibbousWaxing": 6,
+			"full": 8,
+			"gibbousWaning": 10,
+			"halfWaning": 12,
+			"quarterWaning": 14
+		};
+		const phaseOffsets = isDST ? dstPhaseOffsets : dsPhaseOffsets;
+		const cycleLength = isDST ? 20 : 16;
+		const offset = phaseOffsets[phase];
+		let adjustedStart = startDay - offset;
+		if (adjustedStart < 1) adjustedStart += cycleLength;
+		
+		let str = `<table class='compact-table'><caption>Moon Cycles From Day ${startDay} (${phase}) To ${lastDay} (${isDST ? "DST" : "DS"})</caption>`;
+		str += isDST ?
+			`<tr>
+				<th><span class='phase-header'><span class='phase-text'>New Moon</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/f/fd/Moon_New.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Quarter (Waxing)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/9/9a/Moon_Quarter.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/e/e5/Moon_Glassed_Quarter.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Half</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/6/6d/Moon_Half_DST.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/8/86/Moon_Glassed_Half.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Gibbous (Waxing)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/b/bd/Moon_Three_Quarters_DST.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/1/13/Moon_Glassed_Three_Quarters.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Full Moon</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/8/8d/Moon_Full_DST.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/9/98/Moon_Glassed_Full.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Gibbous (Waning)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/b/bd/Moon_Three_Quarters_DST.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/1/13/Moon_Glassed_Three_Quarters.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Half</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/6/6d/Moon_Half_DST.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/8/86/Moon_Glassed_Half.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Quarter (Waning)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/9/9a/Moon_Quarter.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/e/e5/Moon_Glassed_Quarter.png/revision/latest'></span></th>
+			</tr>` :
+			`<tr>
+				<th><span class='phase-header'><span class='phase-text'>New Moon</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/f/fd/Moon_New.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Quarter (Waxing)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/9/9a/Moon_Quarter.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Half</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/6/64/Moon_Half.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Gibbous (Waxing)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/0/0b/Moon_Three_Quarters.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Full Moon</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/e/ef/Moon_Full.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Gibbous (Waning)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/0/0b/Moon_Three_Quarters.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Half</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/6/64/Moon_Half.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Quarter (Waning)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/9/9a/Moon_Quarter.png/revision/latest'></span></th>
+			</tr>`;
+		for (let day = adjustedStart; day < lastDay; day += cycleLength) {
+			str += moonCycle(day);
+		}
+		str += "</table>";
+		return str;
+	}
+
+	function moonCycler(lastDay) {
+		let str = `<table class='compact-table'><caption>Moon Cycles From Day 1 To ${lastDay} (${isDST ? "DST" : "DS"})</caption>`;
+		str += isDST ?
+			`<tr>
+				<th><span class='phase-header'><span class='phase-text'>New Moon</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/f/fd/Moon_New.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Quarter (Waxing)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/9/9a/Moon_Quarter.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/e/e5/Moon_Glassed_Quarter.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Half</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/6/6d/Moon_Half_DST.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/8/86/Moon_Glassed_Half.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Gibbous (Waxing)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/b/bd/Moon_Three_Quarters_DST.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/1/13/Moon_Glassed_Three_Quarters.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Full Moon</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/8/8d/Moon_Full_DST.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/9/98/Moon_Glassed_Full.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Gibbous (Waning)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/b/bd/Moon_Three_Quarters_DST.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/1/13/Moon_Glassed_Three_Quarters.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Half</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/6/6d/Moon_Half_DST.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/8/86/Moon_Glassed_Half.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Quarter (Waning)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/9/9a/Moon_Quarter.png/revision/latest'><img src='https://static.wikia.nocookie.net/dont-starve-game/images/e/e5/Moon_Glassed_Quarter.png/revision/latest'></span></th>
+			</tr>` :
+			`<tr>
+				<th><span class='phase-header'><span class='phase-text'>New Moon</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/f/fd/Moon_New.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Quarter (Waxing)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/9/9a/Moon_Quarter.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Half</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/6/64/Moon_Half.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Gibbous (Waxing)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/0/0b/Moon_Three_Quarters.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Full Moon</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/e/ef/Moon_Full.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Gibbous (Waning)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/0/0b/Moon_Three_Quarters.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Half</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/6/64/Moon_Half.png/revision/latest'></span></th>
+				<th><span class='phase-header'><span class='phase-text'>Quarter (Waning)</span><img src='https://static.wikia.nocookie.net/dont-starve-game/images/9/9a/Moon_Quarter.png/revision/latest'></span></th>
+			</tr>`;
+		const cycleLength = isDST ? 20 : 16;
+		for (let day = 1; day < lastDay; day += cycleLength) {
+			str += moonCycle(day);
+		}
+		str += "</table>";
+		return str;
+	}
+
+	function moonCycle(day) {
+		if (isDST) {
+			return `<tr>
+				<td>${day}</td>
+				<td>${day + 1} - ${day + 3}</td>
+				<td>${day + 4} - ${day + 6}</td>
+				<td>${day + 7} - ${day + 9}</td>
+				<td>${day + 10}</td>
+				<td>${day + 11} - ${day + 13}</td>
+				<td>${day + 14} - ${day + 16}</td>
+				<td>${day + 17} - ${day + 19}</td>
+			</tr>`;
+		} else {
+			return `<tr>
+				<td>${day} - ${day + 1}</td>
+				<td>${day + 2} - ${day + 3}</td>
+				<td>${day + 4} - ${day + 5}</td>
+				<td>${day + 6} - ${day + 7}</td>
+				<td>${day + 8} - ${day + 9}</td>
+				<td>${day + 10} - ${day + 11}</td>
+				<td>${day + 12} - ${day + 13}</td>
+				<td>${day + 14} - ${day + 15}</td>
+			</tr>`;
+		}
+	}
+
+	window.addEventListener('load', adjustTableScale);
+	window.addEventListener('resize', adjustTableScale);
+	const resizeObserver = new ResizeObserver(() => adjustTableScale());
+	resizeObserver.observe(document.documentElement);
+</script>
+
+</html>
