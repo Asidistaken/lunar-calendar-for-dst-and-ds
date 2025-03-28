@@ -68,7 +68,7 @@
 		font-size: 16px;
 		overflow-x: hidden;
 	}
-
+	
 	.content-wrapper {
 		flex: 1;
 		width: 100%;
@@ -76,7 +76,7 @@
 		padding: 20px;
 		box-sizing: border-box;
 	}
-
+	
 	#table-container {
 		margin: 20px 0;
 		width: 100%;
@@ -84,7 +84,7 @@
 		max-width: 100vw;
 		-webkit-overflow-scrolling: touch;
 	}
-
+	
 	.compact-table {
 		border-collapse: collapse;
 		background: #f5e6d3;
@@ -93,7 +93,7 @@
 		transition: transform 0.3s ease;
 		min-width: min(100%, 1400px);
 	}
-
+	
 	.compact-table th,
 	.compact-table td {
 		border: 2px solid #6b4423;
@@ -101,13 +101,13 @@
 		text-align: center;
 		min-width: 120px;
 	}
-
+	
 	.compact-table th {
 		background-color: #8b5d2e;
 		color: #FFFAFA;
 		font-weight: normal;
 	}
-
+	
 	.phase-header {
 		display: flex;
 		align-items: center;
@@ -115,33 +115,33 @@
 		gap: 5px;
 		white-space: nowrap;
 	}
-
+	
 	.phase-text {
 		white-space: nowrap;
 		flex-shrink: 0;
 	}
-
+	
 	.compact-table img {
 		width: 40px;
 		height: 40px;
 		object-fit: contain;
 		flex-shrink: 0;
 	}
-
+	
 	#table-container::-webkit-scrollbar {
 		height: 8px;
 		background-color: #f5e6d3;
 	}
-
+	
 	#table-container::-webkit-scrollbar-thumb {
 		background: #8b5d2e;
 		border-radius: 4px;
 	}
-
+	
 	#table-container::-webkit-scrollbar-thumb:hover {
 		background: #6b4423;
 	}
-
+	
 	@media (orientation: portrait), (max-aspect-ratio: 1/1) {
 		#table-container {
 			overflow-x: auto;
@@ -156,25 +156,25 @@
 			margin: 0;
 		}
 	}
-
+	
 	.title-container {
 		text-align: center;
 		margin: 20px 0;
 	}
-
+	
 	#headerImage {
 		max-height: 200px;
 		width: auto;
 		object-fit: contain;
 		margin: 0 auto;
 	}
-
+	
 	h2 {
 		margin: 10px 0;
 		color: #FFFAFA;
 		font-size: 1.5rem;
 	}
-
+	
 	.switch-container {
 		display: flex;
 		align-items: center;
@@ -182,14 +182,14 @@
 		margin: 20px 0;
 		gap: 10px;
 	}
-
+	
 	.switch {
 		position: relative;
 		display: inline-block;
 		width: 60px;
 		height: 34px;
 	}
-
+	
 	.slider {
 		position: absolute;
 		cursor: pointer;
@@ -201,7 +201,7 @@
 		transition: .4s;
 		border-radius: 34px;
 	}
-
+	
 	.slider:before {
 		position: absolute;
 		content: "";
@@ -214,130 +214,98 @@
 		border-radius: 50%;
 	}
 	
-	input[type="checkbox"] {
-		display: none;
-	}
-
 	input:checked + .slider {
 		background-color: #6b4423;
 	}
-
+	
 	input:checked + .slider:before {
 		transform: translateX(26px);
 	}
-
+	
 	.game-label {
 		font-weight: bold;
 		color: #FFFAFA;
 	}
-
+	
 	.input-container {
 		display: flex;
+		align-items: center;
 		justify-content: center;
 		gap: 10px;
 		margin: 20px 0;
 		flex-wrap: wrap;
 	}
-
+	
+	.input-group {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	
+	.recalibrate-group {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	
+	.input-subgroup {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+	
 	input, button, select {
 		padding: 8px 12px;
 		border: 2px solid #6b4423;
 		border-radius: 6px;
 		font-size: 1rem;
+		height: 40px;
 	}
-
+	
 	button {
 		background: #8b5d2e;
 		color: #FFFAFA;
 		cursor: pointer;
 		transition: background 0.3s;
 	}
-
+	
 	button:hover {
 		background: #6b4423;
 	}
-
+	
+	input[type="checkbox"] {
+		display: none;
+	}
+	
 	footer {
 		text-align: center;
 		margin: 20px 0;
 		color: #6b4423;
 	}
-
-	@media (max-width: 1200px) {
-		.compact-table th,
-		.compact-table td {
-			min-width: 100px;
-			padding: 10px;
-		}
-	}
-
-	@media (max-width: 992px) {
-		.compact-table th,
-		.compact-table td {
-			min-width: 90px;
-			padding: 8px;
-			font-size: 0.9em;
-		}
-
-		.compact-table img {
-			width: 30px;
-			height: 30px;
-		}
-	}
-
+	
 	@media (max-width: 768px) {
-		.compact-table {
-			font-size: 0.9em;
-		}
-
-		.compact-table th,
-		.compact-table td {
-			min-width: 80px;
-			padding: 6px;
-		}
-
-		.compact-table img {
-			width: 25px;
-			height: 25px;
-		}
-
-		.phase-text {
-			font-size: 0.8em;
-		}
-
 		.input-container {
 			flex-direction: column;
-			align-items: center;
+			align-items: stretch;
 		}
-
-		input, button, select {
+		
+		.input-group {
+			flex-direction: column;
+			align-items: stretch;
 			width: 100%;
-			max-width: 300px;
 		}
-	}
-
-	@media (max-width: 480px) {
-		.compact-table {
-			font-size: 0.8em;
+		
+		.recalibrate-group {
+			flex-direction: column;
 		}
-
-		.compact-table th,
-		.compact-table td {
-			min-width: 70px;
-			padding: 4px;
+		
+		.input-subgroup {
+			width: 100%;
+			justify-content: space-between;
 		}
-
-		.compact-table img {
-			width: 20px;
-			height: 20px;
-		}
-
-		.phase-text {
-			font-size: 0.7em;
-		}
-
-		h2 {
-			font-size: 1.2rem;
+		
+		input, select {
+			width: 100%;
 		}
 	}
 </style>
